@@ -1,21 +1,31 @@
-//
-//  ContentView.swift
-//  MagicWaits
-//
-//  Created by Keeley Gardner on 01/03/2025.
-//
-
 import SwiftUI
 
+/*
+ Magic Waits - testing API
+ 
+ Next steps:
+ - Display list of attractions
+ - Further refine attraction details api extraction
+ - Rename + modernise api call files (service/business)
+ - Notifications for ride opening/queue times
+ - Design for application
+ - Display multiple parks
+ - Display attractions first
+ - Filtering
+ */
+
 struct ContentView: View {
+    @StateObject private var viewModel = ContentViewModel()
+
     var body: some View {
         VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+            Text("Magic Waits")
+                .font(.largeTitle)
+                .padding()
+            ScrollView {
+                AttractionListView()
+            }
         }
-        .padding()
     }
 }
 
