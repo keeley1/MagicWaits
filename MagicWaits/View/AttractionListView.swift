@@ -2,6 +2,7 @@ import SwiftUI
 
 struct AttractionListView: View {
     @StateObject private var viewModel = ContentViewModel()
+    var parkId: String
     
     var body: some View {
         ScrollView {
@@ -38,10 +39,11 @@ struct AttractionListView: View {
                 }
             }
         }
+        .edgesIgnoringSafeArea(.all)
         .onAppear {
             Task {
                 do {
-                    try await viewModel.fetchDisneylandData()
+                    try await viewModel.fetchParkData(id: parkId)
                 } catch {
                     print("Failed to fetch data: \(error)")
                 }
@@ -51,5 +53,5 @@ struct AttractionListView: View {
 }
 
 #Preview {
-    AttractionListView()
+    AttractionListView(parkId: "bfc89fd6-314d-44b4-b89e-df1a89cf991e")
 }
