@@ -1,12 +1,14 @@
 import Foundation
 
+//*** review this model ***
+
 struct Attraction: Decodable {
     let id: String
     let name: String
     let entityType: String
     let parkId: String?
     let externalId: String
-    let status: String
+    let status: LiveStatus
     let showtimes: [Showtime]?
     let queue: Queue?
 }
@@ -34,6 +36,13 @@ struct Queue: Decodable {
 
 struct Standby: Decodable {
     let waitTime: Int?
+}
+
+enum LiveStatus: String, Decodable {
+    case operating = "OPERATING"
+    case down = "DOWN"
+    case closed = "CLOSED"
+    case refurbishment = "REFURBISHMENT"
 }
 
 struct DisneylandData: Decodable {

@@ -15,6 +15,9 @@ import SwiftUI
  - Display multiple parks
  - Display attractions first
  - Filtering
+ 
+ - review class v struct for view models
+ - review private, public vars
  */
 
 struct ContentView: View {
@@ -23,10 +26,7 @@ struct ContentView: View {
 
     var body: some View {
         VStack {
-            Text("Magic Waits")
-                .font(.largeTitle)
-                .padding()
-            DestinationListView()
+            SelectParkView()
         }
     }
 }

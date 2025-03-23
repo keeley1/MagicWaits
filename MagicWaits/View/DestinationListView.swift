@@ -6,6 +6,9 @@ struct DestinationListView: View {
     var body: some View {
         NavigationStack {
             VStack {
+                Text("Magic Waits")
+                    .font(.largeTitle)
+                    .padding()
                 Text("Destinations")
                     .font(.title)
                 ScrollView {
