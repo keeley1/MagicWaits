@@ -2,10 +2,17 @@ import Foundation
 
 //*** review this model ***
 
+/*
+ To include for details - should get data here to avoid extra api calls
+- review what should be optional
+- attraction operating hours
+- last updated can get from api
+ */
+
 struct Attraction: Decodable {
     let id: String
     let name: String
-    let entityType: String
+    let entityType: EntityType
     let parkId: String?
     let externalId: String
     let status: LiveStatus
@@ -43,6 +50,23 @@ enum LiveStatus: String, Decodable {
     case down = "DOWN"
     case closed = "CLOSED"
     case refurbishment = "REFURBISHMENT"
+
+    var capitalizedStatus: String {
+        return self.rawValue.capitalized
+    }
+}
+
+enum EntityType: String, Decodable {
+    case destination = "DESTINATION"
+    case park = "PARK"
+    case attraction = "ATTRACTION"
+    case restuarant = "RESTAURANT"
+    case hotel = "HOTEL"
+    case show = "SHOW"
+    
+    var capitalizedEntityType: String {
+        return self.rawValue.capitalized
+    }
 }
 
 struct DisneylandData: Decodable {
