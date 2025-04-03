@@ -4,12 +4,23 @@ import Combine
 // possibly find thrill level etc, look at figma designs
 // colour theme include in more places
 
+/*
+ To do
+ - check how vars are being passed
+ - check how api call data is being stored,
+    what is the ideal way to do that
+ - Look into how to filter/search
+ - Should custom toolbar be in this file
+ - review how api should be called
+ - sort by land, park, thrill?
+ */
 struct AttractionsListView: View {
     @StateObject private var viewModel = AttractionListViewModel()
     
     private let timerPublisher = Timer.publish(every: 300, on: .main, in: .common)
     @State private var cancellable: Cancellable?
-
+    @State private var selectedAttraction: Attraction?
+    
     var parkId: String
     var parkName: String
 
@@ -41,60 +52,64 @@ struct AttractionsListView: View {
         .onDisappear {
             cancellable?.cancel()
         }
+        .sheet(item: $selectedAttraction) { attraction in
+            AttractionDetailsView(attraction: attraction)
+        }
     }
 
     private var attractionView: some View {
         ForEach(viewModel.attractions, id: \.id) { attraction in
-            NavigationLink(destination: AttractionDetailsView(attractionName: attraction.name)) {
-                VStack(alignment: .leading) {
-                    HStack {
-                        Text(attraction.name)
-                            .foregroundColor(.black)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                        Button(action: {
-                            print("Button pressed")
-                        }) {
-                            Image(systemName: "heart")
-                                .foregroundColor(.black)
-                        }
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    
-                    HStack {
-                        Text(attraction.entityType.capitalizedEntityType)
-                            .foregroundColor(.black)
-                        Image(systemName: "circle.fill")
-                            .font(.system(size: 5))
-                            .foregroundColor(.black)
-                        Text("Tomorrowland")
+            VStack(alignment: .leading) {
+                HStack {
+                    Text(attraction.name)
+                        .foregroundColor(.black)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    Button(action: {
+                        print("Button pressed")
+                    }) {
+                        Image(systemName: "heart")
                             .foregroundColor(.black)
                     }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    
-                    HStack {
-                        if let waitTime = attraction.queue?.formattedQueue {
-                            if waitTime != " " {
-                                Text("\(waitTime) min")
-                                    .foregroundColor(attraction.queueTextColor)
-                                    .padding(8)
-                                    .background(attraction.queueBackgroundColor)
-                                    .cornerRadius(8)
-                            }
-                        }
-                        Text(attraction.status.capitalizedStatus)
-                            .foregroundColor(attraction.statusTextColor)
-                            .padding(8)
-                            .background(attraction.statusBackgroundColor)
-                            .cornerRadius(8)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.top, 4)
                 }
-                .padding()
-                .frame(maxWidth: .infinity)
-                .background(Color.white)
-                .cornerRadius(16)
-                .padding(.vertical, 4)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                
+                HStack {
+                    Text(attraction.entityType.capitalizedEntityType)
+                        .foregroundColor(.black)
+                    Image(systemName: "circle.fill")
+                        .font(.system(size: 5))
+                        .foregroundColor(.black)
+                    Text("Tomorrowland")
+                        .foregroundColor(.black)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                
+                HStack {
+                    if let waitTime = attraction.queue?.formattedQueue {
+                        if waitTime != " " {
+                            Text("\(waitTime) min")
+                                .foregroundColor(attraction.queueTextColor)
+                                .padding(8)
+                                .background(attraction.queueBackgroundColor)
+                                .cornerRadius(8)
+                        }
+                    }
+                    Text(attraction.status.capitalizedStatus)
+                        .foregroundColor(attraction.statusTextColor)
+                        .padding(8)
+                        .background(attraction.statusBackgroundColor)
+                        .cornerRadius(8)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.top, 4)
+            }
+            .padding()
+            .frame(maxWidth: .infinity)
+            .background(Color.white)
+            .cornerRadius(16)
+            .padding(.vertical, 4)
+            .onTapGesture {
+                selectedAttraction = attraction
             }
         }
     }

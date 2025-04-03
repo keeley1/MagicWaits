@@ -9,12 +9,11 @@ import Foundation
 - last updated can get from api
  */
 
-struct Attraction: Decodable {
+struct Attraction: Decodable, Identifiable {
     let id: String
     let name: String
     let entityType: EntityType
     let parkId: String?
-    let externalId: String
     let status: LiveStatus
     let showtimes: [Showtime]?
     let queue: Queue?

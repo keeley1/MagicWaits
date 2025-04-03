@@ -1,6 +1,10 @@
 import Foundation
 import Combine
 
+/*
+ review how attractions are being retrieved
+ */
+
 class AttractionListViewModel: ObservableObject {
     @Published var attractions: [Attraction] = []
     

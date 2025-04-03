@@ -12,7 +12,6 @@ class ParksDataService {
             do {
                 let decodedResponse = try JSONDecoder().decode([String: [Destination]].self, from: data)
                 if let decoded = decodedResponse["destinations"] {
-                    print("Data retrieved: \(decoded)")
                     return decoded
                 } else {
                     print("No destinations found in response")
@@ -34,7 +33,15 @@ class ParksDataService {
         let (data, _) = try await URLSession.shared.data(from: url)
         let decoded = try JSONDecoder().decode(DisneylandData.self, from: data)
 
-        let filteredData = decoded.liveData.filter { $0.entityType == .attraction || $0.entityType == .show }
+        var filteredData = decoded.liveData.filter { $0.entityType == .attraction || $0.entityType == .show }
+        
+        for data in filteredData {
+            if data.entityType == .attraction {
+                print("attraction name: ", data.name)
+            }
+        }
+        
+        // fetch image URL for each attraction
         
         return filteredData
     }

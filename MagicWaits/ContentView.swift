@@ -24,6 +24,10 @@ import SwiftUI
  
  - review class v struct for view models
  - review private, public vars
+ - error handling
+ - should protocols be used throughout???
+ - do my models need initialisers
+ - explore what to do if 
  */
 
 struct ContentView: View {
