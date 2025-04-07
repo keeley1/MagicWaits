@@ -5,26 +5,26 @@ extension Attraction {
     var statusTextColor: Color {
         switch status {
         case .operating:
-            return Color(hex: "059669")
+            return Color("AttractionGreenTextColor")
         case .down:
-            return Color(hex: "D97706")
+            return Color("AttractionOrangeTextColor")
         case .closed:
-            return Color(hex: "B60000")
+            return Color("AttractionRedTextColor")
         case .refurbishment:
-            return Color(hex: "0056C7")
+            return Color("AttractionRefurbishmentTextColor")
         }
     }
     
     var statusBackgroundColor: Color {
         switch status {
         case .operating:
-            return Color(hex: "D1FAE5")
+            return Color("AttractionGreenBackgroundColor")
         case .down:
-            return Color(hex: "FEF3C7")
+            return Color("AttractionOrangeBackgroundColor")
         case .closed:
-            return Color(hex: "FFDADA")
+            return Color("AttractionRedBackgroundColor")
         case .refurbishment:
-            return Color(hex: "CDE3FF")
+            return Color("AttractionRefurbishmentBackgroundColor")
         }
     }
 }

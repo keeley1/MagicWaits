@@ -6,11 +6,11 @@ extension Attraction {
         let waitTime = queue?.standby?.waitTime ?? 0
         
         if waitTime <= 30 {
-            return Color(hex: "059669")
+            return Color("AttractionGreenTextColor")
         } else if waitTime <= 55 {
-            return Color(hex: "D97706")
+            return Color("AttractionOrangeTextColor")
         } else {
-            return Color(hex: "B60000")
+            return Color("AttractionRedTextColor")
         }
     }
     
@@ -18,11 +18,11 @@ extension Attraction {
         let waitTime = queue?.standby?.waitTime ?? 0
         
         if waitTime <= 30 {
-            return Color(hex: "D1FAE5")
+            return Color("AttractionGreenBackgroundColor")
         } else if waitTime <= 55 {
-            return Color(hex: "FEF3C7")
+            return Color("AttractionOrangeBackgroundColor")
         } else {
-            return Color(hex: "FFDADA")
+            return Color("AttractionRedBackgroundColor")
         }
     }
 }

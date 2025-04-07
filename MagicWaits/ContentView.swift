@@ -27,7 +27,9 @@ import SwiftUI
  - error handling
  - should protocols be used throughout???
  - do my models need initialisers
- - explore what to do if 
+ - explore what to do if
+ 
+ - can get average waits from queue-times.com
  */
 
 struct ContentView: View {

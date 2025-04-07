@@ -13,6 +13,7 @@ import Combine
  - Should custom toolbar be in this file
  - review how api should be called
  - sort by land, park, thrill?
+ - make navbar at top app colours????
  */
 struct AttractionsListView: View {
     @StateObject private var viewModel = AttractionListViewModel()
@@ -20,13 +21,14 @@ struct AttractionsListView: View {
     private let timerPublisher = Timer.publish(every: 300, on: .main, in: .common)
     @State private var cancellable: Cancellable?
     @State private var selectedAttraction: Attraction?
+    @State private var searchTerm: String = ""
     
     var parkId: String
     var parkName: String
 
     var body: some View {
         ZStack {
-            Color(hex: "E5E7EB")
+            Color("BackgroundColor")
                 .edgesIgnoringSafeArea(.all)
 
             VStack(alignment: .leading) {
@@ -62,39 +64,36 @@ struct AttractionsListView: View {
             VStack(alignment: .leading) {
                 HStack {
                     Text(attraction.name)
-                        .foregroundColor(.black)
+                        .font(.title3)
                         .frame(maxWidth: .infinity, alignment: .leading)
                     Button(action: {
                         print("Button pressed")
                     }) {
                         Image(systemName: "heart")
-                            .foregroundColor(.black)
+                            .foregroundColor(Color("IconColor"))
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 
                 HStack {
                     Text(attraction.entityType.capitalizedEntityType)
-                        .foregroundColor(.black)
                     Image(systemName: "circle.fill")
                         .font(.system(size: 5))
-                        .foregroundColor(.black)
                     Text("Tomorrowland")
-                        .foregroundColor(.black)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 
                 HStack {
                     if let waitTime = attraction.queue?.formattedQueue {
                         if waitTime != " " {
-                            Text("\(waitTime) min")
+                            Text("**\(waitTime)**")
                                 .foregroundColor(attraction.queueTextColor)
                                 .padding(8)
                                 .background(attraction.queueBackgroundColor)
                                 .cornerRadius(8)
                         }
                     }
-                    Text(attraction.status.capitalizedStatus)
+                    Text("**\(attraction.status.capitalizedStatus)**")
                         .foregroundColor(attraction.statusTextColor)
                         .padding(8)
                         .background(attraction.statusBackgroundColor)
@@ -105,7 +104,7 @@ struct AttractionsListView: View {
             }
             .padding()
             .frame(maxWidth: .infinity)
-            .background(Color.white)
+            .background(Color("SecondaryColor"))
             .cornerRadius(16)
             .padding(.vertical, 4)
             .onTapGesture {
@@ -115,22 +114,16 @@ struct AttractionsListView: View {
     }
 
     private var searchview: some View {
-        HStack {
-            Image(systemName: "magnifyingglass")
-                .foregroundStyle(.black)
-            Text("Search attractions")
+        VStack {
+            TextField("Search attractions", text: $searchTerm)
+                .textFieldStyle(RoundedBorderTextFieldStyle())
+                .onChange(of: searchTerm) {
+                    if searchTerm.count >= 2 {
+                        print("Current search: ", searchTerm)
+                    }
+                }
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
         .padding()
-        .foregroundStyle(.black)
-        .background(Color.white)
-        .clipShape(.capsule)
-        .overlay(
-            RoundedRectangle(cornerRadius: 28)
-                .stroke(Color.gray, lineWidth: 1)
-        )
-        .background(Color(hex: "E5E7EB"))
-        .padding(.top, 16)
     }
 }
 
@@ -142,20 +135,22 @@ struct CustomToolbar: View {
             HStack {
                 Text("**\(parkName)**")
                     .font(.largeTitle)
-                    .foregroundColor(.black)
                 Spacer()
                 Button(action: {
                     print("Button pressed")
                 }) {
                     Image(systemName: "moon.fill")
-                        .foregroundStyle(.black)
+                        .foregroundStyle(Color("IconColor"))
                 }
             }
             .padding(.horizontal)
             Spacer()
                 .frame(height: 16)
         }
-        .background(Color(hex: "E5E7EB"))
+        .background {
+            LinearGradient(gradient: Gradient(colors: [Color("IndigoGradientColor"), Color("PurpleGradientColor")]), startPoint: .trailing, endPoint: .leading)
+                .edgesIgnoringSafeArea(.top)
+        }
     }
 }
 

@@ -33,7 +33,7 @@ struct Queue: Decodable {
     
     var formattedQueue: String? {
         if let waitTime = standby?.waitTime {
-            return "\(waitTime)"
+            return "\(waitTime) min"
         } else {
             return " "
         }
