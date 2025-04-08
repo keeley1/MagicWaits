@@ -33,7 +33,8 @@ class ParksDataService {
         let (data, _) = try await URLSession.shared.data(from: url)
         let decoded = try JSONDecoder().decode(DisneylandData.self, from: data)
 
-        var filteredData = decoded.liveData.filter { $0.entityType == .attraction || $0.entityType == .show }
+        // further filter to display with wait times first - should this be here or view model?
+        let filteredData = decoded.liveData.filter { $0.entityType == .attraction || $0.entityType == .show }
         
         for data in filteredData {
             if data.entityType == .attraction {

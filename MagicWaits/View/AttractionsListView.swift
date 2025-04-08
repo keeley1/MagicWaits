@@ -14,6 +14,13 @@ import Combine
  - review how api should be called
  - sort by land, park, thrill?
  - make navbar at top app colours????
+ - should app title be visible on this page?
+ - fix padding on filters
+ - add filter button that can hide filters
+ - add constants for corner radius, etc
+ - test what happens to filter, search when api is called
+ - check search + style search bar
+ - should this page have a back button (to selection) or select park button
  */
 struct AttractionsListView: View {
     @StateObject private var viewModel = AttractionListViewModel()
@@ -22,6 +29,8 @@ struct AttractionsListView: View {
     @State private var cancellable: Cancellable?
     @State private var selectedAttraction: Attraction?
     @State private var searchTerm: String = ""
+    @State private var isFilteredByStatus: Bool = false
+    @State private var isFilteredByType: Bool = false
     
     var parkId: String
     var parkName: String
@@ -36,11 +45,12 @@ struct AttractionsListView: View {
                 ScrollView {
                     VStack {
                         searchview
-                            .padding(.horizontal, 16)
+                        filterAttractionsView
                         attractionView
                             .padding(.horizontal, 16)
                     }
                 }
+                .scrollDismissesKeyboard(.immediately)
             }
         }
         .onAppear {
@@ -118,12 +128,68 @@ struct AttractionsListView: View {
             TextField("Search attractions", text: $searchTerm)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .onChange(of: searchTerm) {
-                    if searchTerm.count >= 2 {
-                        print("Current search: ", searchTerm)
-                    }
+                    viewModel.searchAttractions(searchTerm: searchTerm)
                 }
         }
-        .padding()
+        .padding(.horizontal)
+        .padding(.top)
+        .padding(.bottom, 8)
+    }
+    
+    private var filterAttractionsView: some View {
+        HStack() {
+            Text("Filters")
+            Spacer()
+            
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack {
+                    // look into alternative spacing solution
+                    Spacer()
+                    Spacer()
+                    Spacer()
+                    
+                    // review text colour for light + dark
+                    Button(action: {
+                        if isFilteredByType {
+                            viewModel.returnAllAttractions()
+                        } else {
+                            viewModel.filterAttractionsByType(type: .attraction)
+                        }
+                        isFilteredByType.toggle()
+                    }) {
+                        Text("Attractions")
+                    }
+                    .foregroundStyle(Color("IconColor"))
+                    .padding(.horizontal)
+                    .padding(.vertical, 8)
+                    .background(
+                        RoundedRectangle(cornerRadius: 16)
+                            .fill(isFilteredByType ? Color.purple : Color("FilterButtonColor"))
+                    )
+                    
+                    Button(action: {
+                        if isFilteredByStatus {
+                            viewModel.returnAllAttractions()
+                        } else {
+                            viewModel.filterAttractionByStatus(status: .operating)
+                        }
+                        isFilteredByStatus.toggle()
+                    }) {
+                        Text("Operating")
+                    }
+                    .foregroundStyle(Color("IconColor"))
+                    .padding(.horizontal)
+                    .padding(.vertical, 8)
+                    .background(
+                        RoundedRectangle(cornerRadius: 16)
+                            .fill(isFilteredByStatus ? Color.purple : Color("FilterButtonColor"))
+                    )
+                }
+                .frame(maxWidth: .infinity, alignment: .trailing)
+            }
+            .frame(width: 250)
+        }
+        .padding(.horizontal)
     }
 }
 

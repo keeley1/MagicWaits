@@ -7,6 +7,7 @@ import Combine
 
 class AttractionListViewModel: ObservableObject {
     @Published var attractions: [Attraction] = []
+    private var initialAttractionList: [Attraction] = []
     
     private let parksDataService: ParksDataService
     private var cancellable: AnyCancellable?
@@ -21,6 +22,7 @@ class AttractionListViewModel: ObservableObject {
             do {
                 let data = try await parksDataService.getAttractionData(parkId: parkId)
                 DispatchQueue.main.async {
+                    self.initialAttractionList = data
                     self.attractions = data
                 }
             } catch {
@@ -29,7 +31,24 @@ class AttractionListViewModel: ObservableObject {
         }
     }
     
-    func filterAttractionByStatus(attractions: [Attraction], status: LiveStatus) -> [Attraction] {
-        return attractions.filter { $0.status == status }
+    // eventually update search to include land?? 
+    func searchAttractions(searchTerm: String) {
+        if searchTerm.isEmpty {
+            attractions = initialAttractionList
+        } else {
+            attractions = attractions.filter { $0.name.lowercased().contains(searchTerm.lowercased()) }
+        }
+    }
+    
+    func filterAttractionByStatus(status: LiveStatus) {
+        attractions = attractions.filter { $0.status == status }
+    }
+    
+    func filterAttractionsByType(type: EntityType) {
+        attractions = attractions.filter { $0.entityType == type }
+    }
+    
+    func returnAllAttractions() {
+        attractions = initialAttractionList
     }
 }
