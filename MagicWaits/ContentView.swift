@@ -35,7 +35,20 @@ import SwiftUI
 struct ContentView: View {
     var body: some View {
         VStack {
+            BottomNavMenuView
+        }
+    }
+    
+    var BottomNavMenuView: some View {
+        TabView{
             SelectParkView()
+                .tabItem {
+                    Label("Profile",systemImage: "person.fill")
+                }
+            Text("Tv Contents")
+                .tabItem {
+                    Label("Tv",systemImage: "tv.fill")
+                }
         }
     }
 }

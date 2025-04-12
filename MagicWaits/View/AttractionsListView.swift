@@ -21,6 +21,7 @@ import Combine
  - test what happens to filter, search when api is called
  - check search + style search bar
  - should this page have a back button (to selection) or select park button
+ - Make this screen the main home screen
  */
 struct AttractionsListView: View {
     @StateObject private var viewModel = AttractionListViewModel()
@@ -73,7 +74,7 @@ struct AttractionsListView: View {
         ForEach(viewModel.attractions, id: \.id) { attraction in
             VStack(alignment: .leading) {
                 HStack {
-                    Text(attraction.name)
+                    Text("**\(attraction.name)**")
                         .font(.title3)
                         .frame(maxWidth: .infinity, alignment: .leading)
                     Button(action: {
@@ -125,11 +126,14 @@ struct AttractionsListView: View {
 
     private var searchview: some View {
         VStack {
-            TextField("Search attractions", text: $searchTerm)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-                .onChange(of: searchTerm) {
-                    viewModel.searchAttractions(searchTerm: searchTerm)
-                }
+            ZStack {
+                RoundedRectangle(cornerRadius: 8)
+                    .stroke(Color("IconColor"), lineWidth: 1)
+                TextField("Search attractions", text: $searchTerm)
+                    .padding(8)
+            }
+            .background(Color.white)
+            .cornerRadius(8)
         }
         .padding(.horizontal)
         .padding(.top)
@@ -137,23 +141,17 @@ struct AttractionsListView: View {
     }
     
     private var filterAttractionsView: some View {
-        HStack() {
+        HStack {
             Text("Filters")
             Spacer()
             
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack {
-                    // look into alternative spacing solution
-                    Spacer()
-                    Spacer()
-                    Spacer()
-                    
-                    // review text colour for light + dark
                     Button(action: {
                         if isFilteredByType {
-                            viewModel.returnAllAttractions()
+                            viewModel.filterAttractions(byType: nil, andStatus: isFilteredByStatus ? .operating : nil)
                         } else {
-                            viewModel.filterAttractionsByType(type: .attraction)
+                            viewModel.filterAttractions(byType: .attraction, andStatus: isFilteredByStatus ? .operating : nil)
                         }
                         isFilteredByType.toggle()
                     }) {
@@ -164,14 +162,15 @@ struct AttractionsListView: View {
                     .padding(.vertical, 8)
                     .background(
                         RoundedRectangle(cornerRadius: 16)
-                            .fill(isFilteredByType ? Color.purple : Color("FilterButtonColor"))
+                            .fill(isFilteredByType ? Color("PurpleGradientColor") : Color("FilterButtonColor"))
                     )
                     
+                    // Status Filter Button
                     Button(action: {
                         if isFilteredByStatus {
-                            viewModel.returnAllAttractions()
+                            viewModel.filterAttractions(byType: isFilteredByType ? .attraction : nil, andStatus: nil)
                         } else {
-                            viewModel.filterAttractionByStatus(status: .operating)
+                            viewModel.filterAttractions(byType: isFilteredByType ? .attraction : nil, andStatus: .operating)
                         }
                         isFilteredByStatus.toggle()
                     }) {
@@ -182,7 +181,7 @@ struct AttractionsListView: View {
                     .padding(.vertical, 8)
                     .background(
                         RoundedRectangle(cornerRadius: 16)
-                            .fill(isFilteredByStatus ? Color.purple : Color("FilterButtonColor"))
+                            .fill(isFilteredByStatus ? Color("PurpleGradientColor") : Color("FilterButtonColor"))
                     )
                 }
                 .frame(maxWidth: .infinity, alignment: .trailing)
@@ -195,12 +194,16 @@ struct AttractionsListView: View {
 
 struct CustomToolbar: View {
     var parkName: String
+    
+    @State private var selection = "Red"
+    let colors = ["Red", "Green", "Blue", "Black", "Tartan"]
 
     var body: some View {
-        VStack {
+        VStack(alignment: .leading) {
             HStack {
                 Text("**\(parkName)**")
                     .font(.largeTitle)
+                    .foregroundStyle(.white)
                 Spacer()
                 Button(action: {
                     print("Button pressed")
@@ -210,6 +213,16 @@ struct CustomToolbar: View {
                 }
             }
             .padding(.horizontal)
+            
+            Picker("Select a paint color", selection: $selection) {
+                ForEach(colors, id: \.self) {
+                    Text($0)
+                }
+            }
+            .pickerStyle(.menu)
+            .foregroundStyle(.white)
+            .padding(.horizontal)
+            
             Spacer()
                 .frame(height: 16)
         }

@@ -40,12 +40,12 @@ class AttractionListViewModel: ObservableObject {
         }
     }
     
-    func filterAttractionByStatus(status: LiveStatus) {
-        attractions = attractions.filter { $0.status == status }
-    }
-    
-    func filterAttractionsByType(type: EntityType) {
-        attractions = attractions.filter { $0.entityType == type }
+    func filterAttractions(byType type: EntityType?, andStatus status: LiveStatus?) {
+        attractions = initialAttractionList.filter { attraction in
+            let matchesType = type == nil || attraction.entityType == type
+            let matchesStatus = status == nil || attraction.status == status
+            return matchesType && matchesStatus
+        }
     }
     
     func returnAllAttractions() {
