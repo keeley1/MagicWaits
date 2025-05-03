@@ -43,11 +43,11 @@ struct ContentView: View {
         TabView{
             SelectParkView()
                 .tabItem {
-                    Label("Profile",systemImage: "person.fill")
+                    Label("Wait times",systemImage: "sparkles")
                 }
-            Text("Tv Contents")
+            SettingsView()
                 .tabItem {
-                    Label("Tv",systemImage: "tv.fill")
+                    Label("Settings",systemImage: "gearshape.fill")
                 }
         }
     }

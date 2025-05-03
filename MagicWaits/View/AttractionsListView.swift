@@ -196,7 +196,7 @@ struct CustomToolbar: View {
     var parkName: String
     
     @State private var selection = "Red"
-    let colors = ["Red", "Green", "Blue", "Black", "Tartan"]
+    let parks = ["Disneyland Park", "Disney California Adventure Park", "Both parks"]
 
     var body: some View {
         VStack(alignment: .leading) {
@@ -214,8 +214,8 @@ struct CustomToolbar: View {
             }
             .padding(.horizontal)
             
-            Picker("Select a paint color", selection: $selection) {
-                ForEach(colors, id: \.self) {
+            Picker("Select a park", selection: $selection) {
+                ForEach(parks, id: \.self) {
                     Text($0)
                 }
             }
