@@ -25,6 +25,7 @@ import Combine
  */
 struct AttractionsListView: View {
     @StateObject private var viewModel = AttractionListViewModel()
+    @EnvironmentObject var appState: AppState
     
     private let timerPublisher = Timer.publish(every: 300, on: .main, in: .common)
     @State private var cancellable: Cancellable?
@@ -32,9 +33,6 @@ struct AttractionsListView: View {
     @State private var searchTerm: String = ""
     @State private var isFilteredByStatus: Bool = false
     @State private var isFilteredByType: Bool = false
-    
-    var parkId: String
-    var parkName: String
 
     var body: some View {
         ZStack {
@@ -42,7 +40,7 @@ struct AttractionsListView: View {
                 .edgesIgnoringSafeArea(.all)
 
             VStack(alignment: .leading) {
-                CustomToolbar(parkName: parkName)
+                CustomToolbar(parkName: "Disneyland Park")
                 ScrollView {
                     VStack {
                         searchview
@@ -55,12 +53,11 @@ struct AttractionsListView: View {
             }
         }
         .onAppear {
-            viewModel.fetchAttractionListData(parkId: parkId)
-            
+            viewModel.fetchAttractionListData(parkId: appState.currentParkId)
             cancellable = timerPublisher.connect()
         }
         .onReceive(timerPublisher.autoconnect()) { _ in
-            viewModel.fetchAttractionListData(parkId: parkId)
+            viewModel.fetchAttractionListData(parkId: appState.currentParkId)
         }
         .onDisappear {
             cancellable?.cancel()
@@ -132,7 +129,7 @@ struct AttractionsListView: View {
                 TextField("Search attractions", text: $searchTerm)
                     .padding(8)
             }
-            .background(Color.white)
+            .background(Color("SecondaryColor"))
             .cornerRadius(8)
         }
         .padding(.horizontal)
@@ -235,6 +232,6 @@ struct CustomToolbar: View {
 
 #Preview {
     NavigationView {
-        AttractionsListView(parkId: "bfc89fd6-314d-44b4-b89e-df1a89cf991e", parkName: "Disneyland Park")
+        AttractionsListView()
     }
 }

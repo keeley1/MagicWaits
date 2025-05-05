@@ -4,27 +4,14 @@ class ParksDataService {
     // review function:
     func getParksData() async throws -> [Destination] {
         let url = URL(string: "https://api.themeparks.wiki/v1/destinations")!
-        let parksData: [Destination] = []
 
-        do {
-            let (data, _) = try await URLSession.shared.data(from: url)
+        let (data, _) = try await URLSession.shared.data(from: url)
+        let decodedResponse = try JSONDecoder().decode([String: [Destination]].self, from: data)
 
-            do {
-                let decodedResponse = try JSONDecoder().decode([String: [Destination]].self, from: data)
-                if let decoded = decodedResponse["destinations"] {
-                    return decoded
-                } else {
-                    print("No destinations found in response")
-                    return parksData
-                }
-            } catch {
-                print("Error decoding data: \(error)")
-                throw error
-            }
-        } catch {
-            print("Error fetching data: \(error)")
-            throw error
+        guard let destinations = decodedResponse["destinations"] else {
+            throw URLError(.badServerResponse, userInfo: [NSLocalizedDescriptionKey: "No destinations found in response"])
         }
+        return destinations
     }
     
     func getAttractionData(parkId: String) async throws -> [Attraction] {
@@ -41,9 +28,6 @@ class ParksDataService {
                 print("attraction name: ", data.name)
             }
         }
-        
-        // fetch image URL for each attraction
-        
         return filteredData
     }
 }

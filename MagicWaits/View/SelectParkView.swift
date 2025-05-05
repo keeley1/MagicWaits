@@ -12,7 +12,7 @@ struct SelectParkView: View {
                     .ignoresSafeArea()
                 VStack {
                     selectParkHeaderView
-                    selectIndividualParkView
+                    // selectIndividualParkView
                 }
             }
             .onAppear {
@@ -38,43 +38,43 @@ struct SelectParkView: View {
         .padding()
     }
     
-    private var selectIndividualParkView: some View {
-        HStack {
-            ForEach(viewModel.destinations, id: \.id) { destination in
-                if destination.name.contains("Disneyland Resort") {
-                    ForEach(destination.parks, id: \.id) { park in
-                        NavigationLink(destination: AttractionsListView(parkId: park.id, parkName: park.name).environmentObject(viewModel)) {
-                            VStack {
-                                if park.name.contains("Disneyland") {
-                                    Image("SelectParkDisneyland")
-                                        .resizable()
-                                        .aspectRatio(contentMode: .fill)
-                                        .frame(width: 100, height: 100)
-                                        .clipped()
-                                        .cornerRadius(16)
-                                } else {
-                                    Image("SelectParkDCA")
-                                        .resizable()
-                                        .aspectRatio(contentMode: .fill)
-                                        .frame(width: 100, height: 100)
-                                        .clipped()
-                                        .cornerRadius(16)
-                                }
-                                Text(park.name)
-                                    .foregroundStyle(.white)
-                                    .frame(height: 50)
-                                    .multilineTextAlignment(.center)
-                            }
-                            .frame(width: 160, height: 200)
-                            .background(.indigo.opacity(0.3))
-                            .cornerRadius(16)
-                            .padding(8)
-                        }
-                    }
-                }
-            }
-        }
-    }
+//    private var selectIndividualParkView: some View {
+//        HStack {
+//            ForEach(viewModel.destinations, id: \.id) { destination in
+//                if destination.name.contains("Disneyland Resort") {
+//                    ForEach(destination.parks, id: \.id) { park in
+//                        NavigationLink(destination: AttractionsListView(parkId: park.id, parkName: park.name).environmentObject(viewModel)) {
+//                            VStack {
+//                                if park.name.contains("Disneyland") {
+//                                    Image("SelectParkDisneyland")
+//                                        .resizable()
+//                                        .aspectRatio(contentMode: .fill)
+//                                        .frame(width: 100, height: 100)
+//                                        .clipped()
+//                                        .cornerRadius(16)
+//                                } else {
+//                                    Image("SelectParkDCA")
+//                                        .resizable()
+//                                        .aspectRatio(contentMode: .fill)
+//                                        .frame(width: 100, height: 100)
+//                                        .clipped()
+//                                        .cornerRadius(16)
+//                                }
+//                                Text(park.name)
+//                                    .foregroundStyle(.white)
+//                                    .frame(height: 50)
+//                                    .multilineTextAlignment(.center)
+//                            }
+//                            .frame(width: 160, height: 200)
+//                            .background(.indigo.opacity(0.3))
+//                            .cornerRadius(16)
+//                            .padding(8)
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//    }
 }
 
 #Preview {

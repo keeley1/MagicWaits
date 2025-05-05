@@ -1,10 +1,3 @@
-//
-//  MagicWaitsTests.swift
-//  MagicWaitsTests
-//
-//  Created by Keeley Gardner on 01/03/2025.
-//
-
 import Testing
 @testable import MagicWaits
 
