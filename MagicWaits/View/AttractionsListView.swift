@@ -22,13 +22,14 @@ import Combine
  - check search + style search bar
  - should this page have a back button (to selection) or select park button
  - Make this screen the main home screen
+ - Need to check data refreshing
+ - Get favouriting working
+ - Get swap parks working
  */
 struct AttractionsListView: View {
-    @StateObject private var viewModel = AttractionListViewModel()
     @EnvironmentObject var appState: AppState
+    @StateObject private var viewModel = AttractionListViewModel(appState: AppState())
     
-    private let timerPublisher = Timer.publish(every: 300, on: .main, in: .common)
-    @State private var cancellable: Cancellable?
     @State private var selectedAttraction: Attraction?
     @State private var searchTerm: String = ""
     @State private var isFilteredByStatus: Bool = false
@@ -54,70 +55,19 @@ struct AttractionsListView: View {
         }
         .onAppear {
             viewModel.fetchAttractionListData(parkId: appState.currentParkId)
-            cancellable = timerPublisher.connect()
-        }
-        .onReceive(timerPublisher.autoconnect()) { _ in
-            viewModel.fetchAttractionListData(parkId: appState.currentParkId)
-        }
-        .onDisappear {
-            cancellable?.cancel()
+            // cancellable = timerPublisher.connect()
         }
         .sheet(item: $selectedAttraction) { attraction in
             AttractionDetailsView(attraction: attraction)
         }
     }
-
+    
     private var attractionView: some View {
         ForEach(viewModel.attractions, id: \.id) { attraction in
-            VStack(alignment: .leading) {
-                HStack {
-                    Text("**\(attraction.name)**")
-                        .font(.title3)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    Button(action: {
-                        print("Button pressed")
-                    }) {
-                        Image(systemName: "heart")
-                            .foregroundColor(Color("IconColor"))
-                    }
+            AttractionView(attraction: attraction, viewModel: viewModel)
+                .onTapGesture {
+                    selectedAttraction = attraction
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                
-                HStack {
-                    Text(attraction.entityType.capitalizedEntityType)
-                    Image(systemName: "circle.fill")
-                        .font(.system(size: 5))
-                    Text("Tomorrowland")
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                
-                HStack {
-                    if let waitTime = attraction.queue?.formattedQueue {
-                        if waitTime != " " {
-                            Text("**\(waitTime)**")
-                                .foregroundColor(attraction.queueTextColor)
-                                .padding(8)
-                                .background(attraction.queueBackgroundColor)
-                                .cornerRadius(8)
-                        }
-                    }
-                    Text("**\(attraction.status.capitalizedStatus)**")
-                        .foregroundColor(attraction.statusTextColor)
-                        .padding(8)
-                        .background(attraction.statusBackgroundColor)
-                        .cornerRadius(8)
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.top, 4)
-            }
-            .padding()
-            .frame(maxWidth: .infinity)
-            .background(Color("SecondaryColor"))
-            .cornerRadius(16)
-            .padding(.vertical, 4)
-            .onTapGesture {
-                selectedAttraction = attraction
-            }
         }
     }
 
