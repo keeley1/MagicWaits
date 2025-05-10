@@ -41,7 +41,7 @@ struct AttractionsListView: View {
                 .edgesIgnoringSafeArea(.all)
 
             VStack(alignment: .leading) {
-                CustomToolbar(parkName: "Disneyland Park")
+                CustomToolbar(viewModel: viewModel, parkName: "Disneyland Park")
                 ScrollView {
                     VStack {
                         searchview
@@ -55,7 +55,7 @@ struct AttractionsListView: View {
         }
         .onAppear {
             viewModel.fetchAttractionListData(parkId: appState.currentParkId)
-            // cancellable = timerPublisher.connect()
+            viewModel.returnAllAttractions()
         }
         .sheet(item: $selectedAttraction) { attraction in
             AttractionDetailsView(attraction: attraction)
@@ -140,10 +140,15 @@ struct AttractionsListView: View {
 }
 
 struct CustomToolbar: View {
+    @EnvironmentObject var appState: AppState
+    @ObservedObject var viewModel: AttractionListViewModel
+    
     var parkName: String
     
-    @State private var selection = "Red"
-    let parks = ["Disneyland Park", "Disney California Adventure Park", "Both parks"]
+    @State private var selection = ParkIdentifiers.disneylandPark
+    let parks = ["Both parks": ParkIdentifiers.bothParksId,
+                 ParkIdentifiers.disneylandPark: ParkIdentifiers.disneylandParkId,
+                 ParkIdentifiers.californiaAdventurePark: ParkIdentifiers.californiaAdventureParkId]
 
     var body: some View {
         VStack(alignment: .leading) {
@@ -162,13 +167,21 @@ struct CustomToolbar: View {
             .padding(.horizontal)
             
             Picker("Select a park", selection: $selection) {
-                ForEach(parks, id: \.self) {
-                    Text($0)
+                ForEach(Array(parks), id: \.key) { key, value in
+                    Text(key).tag(value)
                 }
             }
             .pickerStyle(.menu)
             .foregroundStyle(.white)
             .padding(.horizontal)
+            .onChange(of: selection) {
+                print("Selected park: \(selection)")
+                print("App state:", appState.currentParkId)
+                appState.currentParkId = selection
+                print("App state:", appState.currentParkId)
+                viewModel.fetchAttractionListData(parkId: appState.currentParkId)
+                viewModel.returnAllAttractions()
+            }
             
             Spacer()
                 .frame(height: 16)

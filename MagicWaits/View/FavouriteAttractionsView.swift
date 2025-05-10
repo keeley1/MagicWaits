@@ -18,7 +18,7 @@ struct FavouriteAttractionsView: View {
                 .edgesIgnoringSafeArea(.all)
 
             VStack(alignment: .leading) {
-                CustomToolbar(parkName: "Disneyland Park")
+                CustomToolbar(viewModel: viewModel, parkName: "Disneyland Park")
                 ScrollView {
                     VStack {
                         attractionView
@@ -29,7 +29,8 @@ struct FavouriteAttractionsView: View {
             }
         }
         .onAppear {
-            viewModel.fetchAttractionListData(parkId: appState.currentParkId)
+            viewModel.fetchAttractionListData(parkId: ParkIdentifiers.bothParksId)
+            viewModel.favouriteAttractions()
         }
         .sheet(item: $selectedAttraction) { attraction in
             AttractionDetailsView(attraction: attraction)
@@ -37,7 +38,7 @@ struct FavouriteAttractionsView: View {
     }
     
     private var attractionView: some View {
-        ForEach(viewModel.attractions, id: \.id) { attraction in
+        ForEach(viewModel.favAttractions, id: \.id) { attraction in
             AttractionView(attraction: attraction, viewModel: viewModel)
                 .onTapGesture {
                     selectedAttraction = attraction
