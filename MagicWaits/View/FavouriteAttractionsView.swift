@@ -18,7 +18,7 @@ struct FavouriteAttractionsView: View {
                 .edgesIgnoringSafeArea(.all)
 
             VStack(alignment: .leading) {
-                CustomToolbar(viewModel: viewModel, parkName: "Disneyland Park")
+                NavbarView(viewModel: viewModel, parkName: "Disneyland Park")
                 ScrollView {
                     VStack {
                         attractionView

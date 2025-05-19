@@ -16,6 +16,12 @@ class AttractionListViewModel: ObservableObject {
     private let timerPublisher = Timer.publish(every: 300, on: .main, in: .common).autoconnect()
     private let appState: AppState
     
+    @Published var searchTerm: String = "" {
+        didSet {
+            searchAttractions(searchTerm: searchTerm)
+        }
+    }
+    
     // initialise parks data service
     init(parksDataService: ParksDataService = ParksDataService(),
          appState: AppState) {

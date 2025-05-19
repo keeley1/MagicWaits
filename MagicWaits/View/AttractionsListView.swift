@@ -31,7 +31,6 @@ struct AttractionsListView: View {
     @StateObject private var viewModel = AttractionListViewModel(appState: AppState())
     
     @State private var selectedAttraction: Attraction?
-    @State private var searchTerm: String = ""
     @State private var isFilteredByStatus: Bool = false
     @State private var isFilteredByType: Bool = false
 
@@ -41,7 +40,8 @@ struct AttractionsListView: View {
                 .edgesIgnoringSafeArea(.all)
 
             VStack(alignment: .leading) {
-                CustomToolbar(viewModel: viewModel, parkName: "Disneyland Park")
+                NavbarView(viewModel: viewModel, parkName: "Disneyland Park")
+                    .environmentObject(appState)
                 ScrollView {
                     VStack {
                         searchview
@@ -71,12 +71,13 @@ struct AttractionsListView: View {
         }
     }
 
+    // TODO: - Look into search & filtering interacting with each other
     private var searchview: some View {
         VStack {
             ZStack {
                 RoundedRectangle(cornerRadius: 8)
                     .stroke(Color("IconColor"), lineWidth: 1)
-                TextField("Search attractions", text: $searchTerm)
+                TextField("Search attractions", text: $viewModel.searchTerm)
                     .padding(8)
             }
             .background(Color("SecondaryColor"))
@@ -136,60 +137,6 @@ struct AttractionsListView: View {
             .frame(width: 250)
         }
         .padding(.horizontal)
-    }
-}
-
-struct CustomToolbar: View {
-    @EnvironmentObject var appState: AppState
-    @ObservedObject var viewModel: AttractionListViewModel
-    
-    var parkName: String
-    
-    @State private var selection = ParkIdentifiers.disneylandPark
-    let parks = ["Both parks": ParkIdentifiers.bothParksId,
-                 ParkIdentifiers.disneylandPark: ParkIdentifiers.disneylandParkId,
-                 ParkIdentifiers.californiaAdventurePark: ParkIdentifiers.californiaAdventureParkId]
-
-    var body: some View {
-        VStack(alignment: .leading) {
-            HStack {
-                Text("**\(parkName)**")
-                    .font(.largeTitle)
-                    .foregroundStyle(.white)
-                Spacer()
-                Button(action: {
-                    print("Button pressed")
-                }) {
-                    Image(systemName: "moon.fill")
-                        .foregroundStyle(Color("IconColor"))
-                }
-            }
-            .padding(.horizontal)
-            
-            Picker("Select a park", selection: $selection) {
-                ForEach(Array(parks), id: \.key) { key, value in
-                    Text(key).tag(value)
-                }
-            }
-            .pickerStyle(.menu)
-            .foregroundStyle(.white)
-            .padding(.horizontal)
-            .onChange(of: selection) {
-                print("Selected park: \(selection)")
-                print("App state:", appState.currentParkId)
-                appState.currentParkId = selection
-                print("App state:", appState.currentParkId)
-                viewModel.fetchAttractionListData(parkId: appState.currentParkId)
-                viewModel.returnAllAttractions()
-            }
-            
-            Spacer()
-                .frame(height: 16)
-        }
-        .background {
-            LinearGradient(gradient: Gradient(colors: [Color("IndigoGradientColor"), Color("PurpleGradientColor")]), startPoint: .trailing, endPoint: .leading)
-                .edgesIgnoringSafeArea(.top)
-        }
     }
 }
 
