@@ -9,6 +9,8 @@ import Combine
 class AttractionListViewModel: ObservableObject {
     @Published var attractions: [Attraction] = []
     @Published var favAttractions: [Attraction] = []
+    @Published var currentType: EntityType? = nil
+    @Published var currentStatus: LiveStatus? = nil
     private var initialAttractionList: [Attraction] = []
     
     private let parksDataService: ParksDataService
@@ -18,7 +20,7 @@ class AttractionListViewModel: ObservableObject {
     
     @Published var searchTerm: String = "" {
         didSet {
-            searchAttractions(searchTerm: searchTerm)
+            updateAttractions()
         }
     }
     
@@ -56,21 +58,26 @@ class AttractionListViewModel: ObservableObject {
             .store(in: &cancellables)
     }
     
-    // eventually update search to include land?? 
-    func searchAttractions(searchTerm: String) {
-        if searchTerm.isEmpty {
-            attractions = initialAttractionList
-        } else {
-            attractions = attractions.filter { $0.name.lowercased().contains(searchTerm.lowercased()) }
-        }
+    func setFilters(type: EntityType?, status: LiveStatus?) {
+        currentType = type
+        currentStatus = status
+        updateAttractions()
     }
     
-    func filterAttractions(byType type: EntityType?, andStatus status: LiveStatus?) {
-        attractions = initialAttractionList.filter { attraction in
-            let matchesType = type == nil || attraction.entityType == type
-            let matchesStatus = status == nil || attraction.status == status
-            return matchesType && matchesStatus
+    private func updateAttractions() {
+        var filtered = initialAttractionList
+
+        if let type = currentType {
+            filtered = filtered.filter { $0.entityType == type }
         }
+        if let status = currentStatus {
+            filtered = filtered.filter { $0.status == status }
+        }
+        if !searchTerm.isEmpty {
+            filtered = filtered.filter { $0.name.lowercased().contains(searchTerm.lowercased()) }
+        }
+
+        attractions = filtered
     }
     
     // Review these two functions:

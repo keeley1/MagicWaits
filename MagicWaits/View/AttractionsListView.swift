@@ -96,12 +96,9 @@ struct AttractionsListView: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack {
                     Button(action: {
-                        if isFilteredByType {
-                            viewModel.filterAttractions(byType: nil, andStatus: isFilteredByStatus ? .operating : nil)
-                        } else {
-                            viewModel.filterAttractions(byType: .attraction, andStatus: isFilteredByStatus ? .operating : nil)
-                        }
                         isFilteredByType.toggle()
+                        let type: EntityType? = isFilteredByType ? .attraction : nil
+                        viewModel.setFilters(type: type, status: viewModel.currentStatus)
                     }) {
                         Text("Attractions")
                     }
@@ -115,12 +112,9 @@ struct AttractionsListView: View {
                     
                     // Status Filter Button
                     Button(action: {
-                        if isFilteredByStatus {
-                            viewModel.filterAttractions(byType: isFilteredByType ? .attraction : nil, andStatus: nil)
-                        } else {
-                            viewModel.filterAttractions(byType: isFilteredByType ? .attraction : nil, andStatus: .operating)
-                        }
                         isFilteredByStatus.toggle()
+                        let status: LiveStatus? = isFilteredByStatus ? .operating : nil
+                        viewModel.setFilters(type: viewModel.currentType, status: status)
                     }) {
                         Text("Operating")
                     }
