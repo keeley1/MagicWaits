@@ -2,16 +2,12 @@ import SwiftUI
 import Combine
 
 struct FavouriteAttractionsView: View {
-    @EnvironmentObject var appState: AppState
-    @StateObject private var viewModel = AttractionListViewModel(appState: AppState())
-    
-    private let timerPublisher = Timer.publish(every: 300, on: .main, in: .common)
-    @State private var cancellable: Cancellable?
+    @ObservedObject var viewModel: AttractionListViewModel
     @State private var selectedAttraction: Attraction?
     @State private var searchTerm: String = ""
     @State private var isFilteredByStatus: Bool = false
     @State private var isFilteredByType: Bool = false
-    
+
     var body: some View {
         ZStack {
             Color("BackgroundColor")
@@ -30,15 +26,14 @@ struct FavouriteAttractionsView: View {
         }
         .onAppear {
             viewModel.fetchAttractionListData(parkId: ParkIdentifiers.bothParksId)
-            viewModel.favouriteAttractions()
         }
         .sheet(item: $selectedAttraction) { attraction in
             AttractionDetailsView(attraction: attraction)
         }
     }
-    
+
     private var attractionView: some View {
-        ForEach(viewModel.favAttractions, id: \.id) { attraction in
+        ForEach(viewModel.attractions.filter { viewModel.favourites.contains($0) }, id: \.id) { attraction in
             AttractionView(attraction: attraction, viewModel: viewModel)
                 .onTapGesture {
                     selectedAttraction = attraction
@@ -47,6 +42,23 @@ struct FavouriteAttractionsView: View {
     }
 }
 
+// Consider alternative methods - view model factory etc
+struct FavouriteAttractionsViewContainer: View {
+    @EnvironmentObject var appState: AppState
+    @EnvironmentObject var favourites: Favourites
+    @StateObject private var viewModel: AttractionListViewModel
+
+    init() {
+        _viewModel = StateObject(wrappedValue: AttractionListViewModel(appState: AppState(), favourites: Favourites()))
+    }
+
+    var body: some View {
+        FavouriteAttractionsView(viewModel: viewModel)
+    }
+}
+
 #Preview {
-    FavouriteAttractionsView()
+    FavouriteAttractionsViewContainer()
+        .environmentObject(AppState())
+        .environmentObject(Favourites())
 }

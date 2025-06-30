@@ -3,11 +3,11 @@ import SwiftUI
 struct ToolbarView: View {
     var body: some View {
         TabView {
-            AttractionsListView()
+            AttractionsListViewContainer()
                 .tabItem {
                     Label("Wait times", systemImage: "sparkles")
                 }
-            FavouriteAttractionsView()
+            FavouriteAttractionsViewContainer()
                 .tabItem {
                     Label("Favourites", systemImage: "heart.fill")
                 }
@@ -21,4 +21,6 @@ struct ToolbarView: View {
 
 #Preview {
     ToolbarView()
+        .environmentObject(AppState())
+        .environmentObject(Favourites())
 }

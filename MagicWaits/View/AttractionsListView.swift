@@ -27,9 +27,8 @@ import Combine
  - Get swap parks working
  */
 struct AttractionsListView: View {
-    @EnvironmentObject var appState: AppState
-    @StateObject private var viewModel = AttractionListViewModel(appState: AppState())
-    
+    @ObservedObject var viewModel: AttractionListViewModel
+
     @State private var selectedAttraction: Attraction?
     @State private var isFilteredByStatus: Bool = false
     @State private var isFilteredByType: Bool = false
@@ -41,7 +40,6 @@ struct AttractionsListView: View {
 
             VStack(alignment: .leading) {
                 NavbarView(viewModel: viewModel, parkName: "Disneyland Park")
-                    .environmentObject(appState)
                 ScrollView {
                     VStack {
                         searchview
@@ -54,14 +52,14 @@ struct AttractionsListView: View {
             }
         }
         .onAppear {
-            viewModel.fetchAttractionListData(parkId: appState.currentParkId)
+            viewModel.fetchAttractionListData(parkId: viewModel.appState.currentParkId)
             viewModel.returnAllAttractions()
         }
         .sheet(item: $selectedAttraction) { attraction in
             AttractionDetailsView(attraction: attraction)
         }
     }
-    
+
     private var attractionView: some View {
         ForEach(viewModel.attractions, id: \.id) { attraction in
             AttractionView(attraction: attraction, viewModel: viewModel)
@@ -71,7 +69,6 @@ struct AttractionsListView: View {
         }
     }
 
-    // TODO: - Look into search & filtering interacting with each other
     private var searchview: some View {
         VStack {
             ZStack {
@@ -87,12 +84,11 @@ struct AttractionsListView: View {
         .padding(.top)
         .padding(.bottom, 8)
     }
-    
+
     private var filterAttractionsView: some View {
         HStack {
             Text("Filters")
             Spacer()
-            
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack {
                     Button(action: {
@@ -109,8 +105,7 @@ struct AttractionsListView: View {
                         RoundedRectangle(cornerRadius: 16)
                             .fill(isFilteredByType ? Color("PurpleGradientColor") : Color("FilterButtonColor"))
                     )
-                    
-                    // Status Filter Button
+
                     Button(action: {
                         isFilteredByStatus.toggle()
                         let status: LiveStatus? = isFilteredByStatus ? .operating : nil
@@ -134,8 +129,22 @@ struct AttractionsListView: View {
     }
 }
 
-#Preview {
-    NavigationView {
-        AttractionsListView()
+struct AttractionsListViewContainer: View {
+    @EnvironmentObject var appState: AppState
+    @EnvironmentObject var favourites: Favourites
+    @StateObject private var viewModel: AttractionListViewModel
+
+    init() {
+        _viewModel = StateObject(wrappedValue: AttractionListViewModel(appState: AppState(), favourites: Favourites()))
     }
+
+    var body: some View {
+        AttractionsListView(viewModel: viewModel)
+    }
+}
+
+#Preview {
+    AttractionsListViewContainer()
+        .environmentObject(AppState())
+        .environmentObject(Favourites())
 }

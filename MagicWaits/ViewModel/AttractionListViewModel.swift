@@ -8,7 +8,7 @@ import Combine
 
 class AttractionListViewModel: ObservableObject {
     @Published var attractions: [Attraction] = []
-    @Published var favAttractions: [Attraction] = []
+    // @Published var favAttractions: [Attraction] = []
     @Published var currentType: EntityType? = nil
     @Published var currentStatus: LiveStatus? = nil
     private var initialAttractionList: [Attraction] = []
@@ -16,7 +16,8 @@ class AttractionListViewModel: ObservableObject {
     private let parksDataService: ParksDataService
     private var cancellables = Set<AnyCancellable>()
     private let timerPublisher = Timer.publish(every: 300, on: .main, in: .common).autoconnect()
-    private let appState: AppState
+    let appState: AppState
+    let favourites: Favourites
     
     @Published var searchTerm: String = "" {
         didSet {
@@ -26,10 +27,20 @@ class AttractionListViewModel: ObservableObject {
     
     // initialise parks data service
     init(parksDataService: ParksDataService = ParksDataService(),
-         appState: AppState) {
+         appState: AppState,
+         favourites: Favourites) {
         self.parksDataService = parksDataService
         self.appState = appState
+        self.favourites = favourites
         setupTimer()
+        
+        // Observe changes to favourites and update attractions
+        favourites.$attractionIDs
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.updateAttractions()
+            }
+            .store(in: &cancellables)
     }
     
     func fetchAttractionListData(parkId: String) {
@@ -38,7 +49,7 @@ class AttractionListViewModel: ObservableObject {
                 let data = try await parksDataService.getAttractionData(parkId: parkId)
                 DispatchQueue.main.async {
                     self.initialAttractionList = data
-                    self.loadFavouriteState()
+                    //self.loadFavouriteState()
                     self.attractions = data
                     //self.favouriteAttractions()
                 }
@@ -76,42 +87,47 @@ class AttractionListViewModel: ObservableObject {
         if !searchTerm.isEmpty {
             filtered = filtered.filter { $0.name.lowercased().contains(searchTerm.lowercased()) }
         }
+        
+        for index in filtered.indices {
+            filtered[index].isFavourited = favourites.contains(filtered[index])
+        }
 
         attractions = filtered
     }
     
-    // Review these two functions:
     func toggleFavourite(attraction: Attraction) {
-        if let index = initialAttractionList.firstIndex(where: { $0.id == attraction.id }) {
-            let attractionToUpdate = initialAttractionList[index]
-            attractionToUpdate.isFavourited.toggle()
-            print("Updated \(attractionToUpdate.name) isFavourited to \(attractionToUpdate.isFavourited)")
-            saveFavouriteState()
+        print("Toggle favourites reached")
+        if favourites.contains(attraction) {
+            favourites.remove(attraction)
+            
+        } else {
+            favourites.add(attraction)
         }
+        updateAttractions()
     }
     
     // ATM favs are resetting when park is changed - need global fav list
-    private func saveFavouriteState() {
-        let favouriteIds = initialAttractionList.filter { $0.isFavourited }.map { $0.id }
-        UserDefaults.standard.set(favouriteIds, forKey: "favouriteAttractions")
-    }
-
-    private func loadFavouriteState() {
-        let favouriteIds = UserDefaults.standard.array(forKey: "favouriteAttractions") as? [String] ?? []
-        for index in initialAttractionList.indices {
-            initialAttractionList[index].isFavourited = favouriteIds.contains(initialAttractionList[index].id)
-        }
-        print("Loaded favourite state. Favourite IDs: \(favouriteIds)")
-    }
-    
-    func favouriteAttractions() {
-        self.loadFavouriteState()
-        print("Initial attractions:", initialAttractionList)
-        print("Attractions:", attractions)
-        let filteredAttractions = initialAttractionList.filter { $0.isFavourited }
-        print("Filtered attractions count: \(filteredAttractions.count)")
-        self.favAttractions = filteredAttractions
-    }
+//    private func saveFavouriteState() {
+//        let favouriteIds = initialAttractionList.filter { $0.isFavourited }.map { $0.id }
+//        UserDefaults.standard.set(favouriteIds, forKey: "favouriteAttractions")
+//    }
+//
+//    private func loadFavouriteState() {
+//        let favouriteIds = UserDefaults.standard.array(forKey: "favouriteAttractions") as? [String] ?? []
+//        for index in initialAttractionList.indices {
+//            initialAttractionList[index].isFavourited = favouriteIds.contains(initialAttractionList[index].id)
+//        }
+//        print("Loaded favourite state. Favourite IDs: \(favouriteIds)")
+//    }
+//    
+//    func favouriteAttractions() {
+//        self.loadFavouriteState()
+//        print("Initial attractions:", initialAttractionList)
+//        print("Attractions:", attractions)
+//        let filteredAttractions = initialAttractionList.filter { $0.isFavourited }
+//        print("Filtered attractions count: \(filteredAttractions.count)")
+//        self.favAttractions = filteredAttractions
+//    }
     
     func returnAllAttractions() {
         attractions = initialAttractionList

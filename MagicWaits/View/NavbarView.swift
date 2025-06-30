@@ -57,7 +57,8 @@ struct NavbarView: View {
 
 #Preview {
     let appState = AppState()
-    let viewModel = AttractionListViewModel(appState: appState)
+    let favourites = Favourites()
+    let viewModel = AttractionListViewModel(appState: appState, favourites: favourites)
     NavbarView(viewModel: viewModel, parkName: "Disneyland Park")
         .environmentObject(appState)
 }
